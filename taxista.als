@@ -64,6 +64,11 @@ fact Corrida{
 fact Taxista{
 	--Todo taxista tem uma central.
 	all t:Taxista | one t.~taxistas
+
+	--O taxista deve possuir o cliente para possuir uma ligação com o mesmo
+	all t:Taxista | 
+ 	(t.ligacao in LigacaoCliente) =>
+ 	t.ligacao.cliente in t.clientes	
 }
 
 fact Passageiro{
@@ -81,7 +86,7 @@ fact Cliente{
 
 fact Ligacao{
 	--Uma ligação tem que ter um taxista.
-	all l:Ligacao | one l.~ligacao	
+	all l:Ligacao | one l.~ligacao
 }
 
 --Retorna todos os clientes de um dado taxista.
