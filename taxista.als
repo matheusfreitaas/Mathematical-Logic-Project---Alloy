@@ -2,13 +2,12 @@ module Taxi
 
 --Assinatura da central.
 sig Central{
-	taxistas: set Taxista,
-	ligacoes: set LigacaoCentral
+	taxistas: set Taxista
 }
 
 --Assinatura do taxista.
 sig Taxista{
-	ligacao: lone LigacaoCliente,
+	ligacao: lone Ligacao,
 	corrida: lone Corrida,
 	clientes: set Cliente
 }
@@ -23,9 +22,8 @@ sig Passageiro{}
 abstract sig Ligacao{}
 
 --Assinatura dos diferentes tipos de ligações.
-sig LigacaoCentral extends Ligacao{
-	passageiro: one Passageiro
-}
+sig LigacaoCentral extends Ligacao{}
+
 sig LigacaoCliente extends Ligacao{
 	cliente: one Cliente
 }
@@ -36,8 +34,8 @@ abstract sig Corrida{
 }
 
 --Assinatura dos diferentes tipos de corrida.
-sig CorridaMesmoLugar extends Corrida{}
-sig CorridaLugarDiferente extends Corrida{}
+sig CorridaDestinoUnico extends Corrida{}
+sig CorridaMaisDeUmDestino extends Corrida{}
 
 --Predicado que define que um taxista pode atender ligação se não estiver em outra.
 pred atenderLigacao[t:Taxista]{
@@ -55,6 +53,9 @@ fact Corrida{
 	
 	--Toda corrida tem 1 taxista
 	all c:Corrida | one c.~corrida
+
+	--Toda corrida de mais de um detino deve ter no mínimo dois passageiros
+	all c:CorridaMaisDeUmDestino | #c.passageiros > 1
 	
 	--Toda corrida só pode ter no máximo 4 passageiros.
 	all c:Corrida | #c.passageiros <= 4
@@ -66,9 +67,6 @@ fact Taxista{
 }
 
 fact Passageiro{
-	--Um passageiro só pode estar em uma ligação.
-	all p:Passageiro | one p.~passageiro
-
 	--Um passageiro só pode estar em uma corrida
 	all p:Passageiro | one p.~passageiros
 }
@@ -83,11 +81,7 @@ fact Cliente{
 
 fact Ligacao{
 	--Uma ligação tem que ter um taxista.
-	all l:LigacaoCliente | one l.~ligacao
-
-	--Uma ligação tem que ter uma central.
-	all l:LigacaoCentral | one l.~ligacoes
-	
+	all l:Ligacao | one l.~ligacao	
 }
 
 --Retorna todos os clientes de um dado taxista.
@@ -100,11 +94,6 @@ fun getTaxistas[c:Central]: set Taxista{
 	c.taxistas
 }
 
---Retorna todas as chamadas de uma determinada central.
-fun getLigacoes[c:Central]: set Ligacao{
-	c.ligacoes
-}
-
 --Retorna todos os passageiros de uma determinada corrida.
 fun getPassageiros[c:Corrida]: set Passageiro{
 	c.passageiros
@@ -115,4 +104,3 @@ fun getPassageiros[c:Corrida]: set Passageiro{
 
 pred show[]{}
 run show for 5
-
