@@ -106,6 +106,39 @@ fun getPassageiros[c:Corrida]: set Passageiro{
 
 --Testes
 
+-- Teste responsável por verificar que todo taxista tem exatamente 1 central
+assert testeCentralTemTaxista{
+	all t:Taxista |  #(t.~taxistas) =1
+}
+
+--Teste responsável por verificar se toda corrida tem um taxista
+assert testeCorridaTemUmTaxista{
+	all c:Corrida | #(c.~corrida) =1
+}
+
+--Teste responsável por verificar se toda corrida tem algum passageiro, e tenha no máximo 4
+assert testeCorridaTemPassageiro{
+	all c:Corrida | #(c.passageiros) >0 && #(c.passageiros) <=4
+
+}
+
+--Teste responsável por verificar se o taxista conhece o cliente da ligação de um cliente
+assert testeTaxistaConheceClienteDaLigacao{
+	all l:LigacaoCliente | #(l.cliente) =1 &&   (l.cliente) in (l.~ligacao).clientes
+}
+
+--Teste responsável por verificar se o taxista não tem corrida caso esteja disponível
+assert testeTaxistaDisponivel{
+	all t:Taxista | taxistaDisponivel[t] => no t.corrida
+}
+
+
+check testeCentralTemTaxista
+check testeCorridaTemUmTaxista
+check testeCorridaTemPassageiro
+check testeTaxistaConheceClienteDaLigacao
+check testeTaxistaDisponivel
 
 pred show[]{}
-run show for 5
+run show for 3
+
