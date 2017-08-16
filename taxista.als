@@ -42,6 +42,11 @@ pred atenderLigacao[t:Taxista]{
 	no t.ligacao 
 }
 
+--Predicado que define que deve existir pelo menos um taxista para a central estar ativa.
+pred centralAtiva[c:Central]{
+	some c.taxistas
+}
+
 --Predicado que define que um taxista está disponível se não está em uma corrida.
 pred taxistaDisponivel[t:Taxista]{
 	no t.corrida
@@ -74,6 +79,11 @@ fact Taxista{
 fact Passageiro{
 	--Um passageiro só pode estar em uma corrida
 	all p:Passageiro | one p.~passageiros
+}
+
+fact Central{
+	--Deve existir apenas 1 central
+	one Central
 }
 
 fact Cliente{
@@ -119,7 +129,6 @@ assert testeCorridaTemUmTaxista{
 --Teste responsável por verificar se toda corrida tem algum passageiro, e tenha no máximo 4
 assert testeCorridaTemPassageiro{
 	all c:Corrida | #(c.passageiros) >0 && #(c.passageiros) <=4
-
 }
 
 --Teste responsável por verificar se o taxista conhece o cliente da ligação de um cliente
@@ -132,7 +141,6 @@ assert testeTaxistaDisponivel{
 	all t:Taxista | taxistaDisponivel[t] => no t.corrida
 }
 
-
 check testeCentralTemTaxista
 check testeCorridaTemUmTaxista
 check testeCorridaTemPassageiro
@@ -141,4 +149,3 @@ check testeTaxistaDisponivel
 
 pred show[]{}
 run show for 3
-
